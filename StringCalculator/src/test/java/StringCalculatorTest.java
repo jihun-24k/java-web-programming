@@ -13,11 +13,17 @@ class StringCalculatorTest {
         sc = new StringCalculator();
     }
 
-
     @DisplayName("쉼표로 문자열을 나눔")
     @Test
     void splitByComma() {
         int res = sc.splitStr("1,2,3");
         assertEquals(6, res);
+    }
+
+    @DisplayName("콜론으로 문자열을 나눔")
+    @Test
+    void splitByColon() {
+        int res = sc.splitStr("1:2");
+        assertEquals(3, res);
     }
 }
