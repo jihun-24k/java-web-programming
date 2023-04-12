@@ -16,35 +16,35 @@ class StringCalculatorTest {
     @DisplayName("쉼표로 문자열을 나눔")
     @Test
     void splitByComma() {
-        int res = sc.splitStr("1,2,3");
-        assertEquals(6, res);
+        assertSplitStr(6, "1,2,3");
     }
 
     @DisplayName("콜론으로 문자열을 나눔")
     @Test
     void splitByColon() {
-        int res = sc.splitStr("1:2");
-        assertEquals(3, res);
+        assertSplitStr(3, "1:2");
     }
 
     @DisplayName("쉼표 또는 콜론으로 문자열을 나눔")
     @Test
     void splitByComma_Or_Colon() {
-        int res = sc.splitStr("1:2,3");
-        assertEquals(6, res);
+        assertSplitStr(6, "1:2,3");
     }
 
     @DisplayName("빈 문자열이면 0을 반환")
     @Test
     void whenEmptyStr_Then_Return_0 () {
-        int res = sc.splitStr("");
-        assertEquals(0, res);
+        assertSplitStr(0, "");
     }
 
     @DisplayName("커스텀 구분자로 문자열을 나눔")
     @Test
     void splitByCustomDelimiter() {
-        int res = sc.splitStr("//;\n1;2;3");
-        assertEquals(6, res);
+        assertSplitStr(6, "//;\n1;2;3");
+    }
+
+    void assertSplitStr(int expectedNum, String s){
+        int realNum = sc.splitStr(s);
+        assertEquals(expectedNum, realNum);
     }
 }
