@@ -33,4 +33,11 @@ class StringCalculatorTest {
         int res = sc.splitStr("1:2,3");
         assertEquals(6, res);
     }
+
+    @DisplayName("빈 문자열이면 0을 반환")
+    @Test
+    void whenEmptyStr_Then_Return_0 () {
+        int res = sc.splitStr("");
+        assertEquals(0, res);
+    }
 }

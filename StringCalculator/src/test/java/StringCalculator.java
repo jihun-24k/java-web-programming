@@ -1,6 +1,9 @@
 public class StringCalculator {
 
     public int splitStr(String s) {
+        if (s.length() == 0)
+            return 0;
+
         String[] nums = s.split(",|:");
         int result = 0;
 
