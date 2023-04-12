@@ -17,7 +17,10 @@ public class StringCalculator {
         int result = 0;
 
         for (String num : nums) {
-            result += Integer.parseInt(num);
+            int n = Integer.parseInt(num);
+            if (n < 0)
+                throw new RuntimeException();
+            result += n;
         }
         return result;
     }

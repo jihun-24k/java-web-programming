@@ -43,6 +43,12 @@ class StringCalculatorTest {
         assertSplitStr(6, "//;\n1;2;3");
     }
 
+    @DisplayName("음수를 전달하면 예외 처리")
+    @Test
+    void whenNum_IsMinus_ThenThrowsException() {
+        assertThrows(RuntimeException.class, () -> sc.splitStr("-1,1,2"));
+    }
+
     void assertSplitStr(int expectedNum, String s){
         int realNum = sc.splitStr(s);
         assertEquals(expectedNum, realNum);
