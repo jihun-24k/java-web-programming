@@ -40,4 +40,11 @@ class StringCalculatorTest {
         int res = sc.splitStr("");
         assertEquals(0, res);
     }
+
+    @DisplayName("커스텀 구분자로 문자열을 나눔")
+    @Test
+    void splitByCustomDelimiter() {
+        int res = sc.splitStr("//;\n1;2;3");
+        assertEquals(6, res);
+    }
 }
