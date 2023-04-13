@@ -14,15 +14,24 @@ public class StringCalculator {
             nums = s.split(",|:");
         }
 
-        int result = 0;
+        return addNumbers(nums);
+    }
+
+    private void checkNegativeNum(int num) {
+        if (num < 0)
+            throw new RuntimeException();
+    }
+
+    private int addNumbers(String[] nums) {
+        int sum = 0;
 
         for (String num : nums) {
             int n = Integer.parseInt(num);
-            if (n < 0)
-                throw new RuntimeException();
-            result += n;
+            checkNegativeNum(n);
+            sum += n;
         }
-        return result;
+
+        return sum;
     }
 
     private boolean isValidStr(String s) {
