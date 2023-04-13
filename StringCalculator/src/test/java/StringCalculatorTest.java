@@ -37,6 +37,12 @@ class StringCalculatorTest {
         assertSplitStr(0, "");
     }
 
+    @DisplayName("null이면 0을 반환")
+    @Test
+    void whenStr_IsNull_Then_Return_0 (){
+        assertSplitStr(0, null);
+    }
+
     @DisplayName("커스텀 구분자로 문자열을 나눔")
     @Test
     void splitByCustomDelimiter() {

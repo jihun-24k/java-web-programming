@@ -2,7 +2,7 @@ public class StringCalculator {
 
     public int splitStr(String s) {
         String[] nums = {};
-        if (s.length() == 0)
+        if (s == null || s.length() == 0)
             return 0;
 
         nums = s.split("\\n");
