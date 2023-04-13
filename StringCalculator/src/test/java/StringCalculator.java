@@ -2,7 +2,7 @@ public class StringCalculator {
 
     public int splitStr(String s) {
         String[] nums = {};
-        if (s == null || s.length() == 0)
+        if (isValidStr(s))
             return 0;
 
         nums = s.split("\\n");
@@ -23,5 +23,17 @@ public class StringCalculator {
             result += n;
         }
         return result;
+    }
+
+    private boolean isValidStr(String s) {
+        return checkNull(s) || checkEmpty(s);
+    }
+
+    private boolean checkNull(String s) {
+        return s == null;
+    }
+
+    private boolean checkEmpty(String s) {
+        return s.length() == 0;
     }
 }
