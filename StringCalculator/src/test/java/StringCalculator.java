@@ -5,16 +5,19 @@ public class StringCalculator {
         if (isValidStr(s))
             return 0;
 
-        nums = s.split("\\n");
-        if (nums[0].contains("//")){
-            String delimiter = nums[0].substring(2);
-            nums = nums[1].split(delimiter);
-        }
-        else {
-            nums = s.split(",|:");
-        }
+        nums = split(s);
 
         return addNumbers(nums);
+    }
+
+    private String[] split(String s) {
+        String[] nums = s.split("\\n");
+        if (nums[0].contains("//")){
+            String delimiter = nums[0].substring(2);
+            return nums[1].split(delimiter);
+        }
+
+        return s.split(",|:");
     }
 
     private void checkNegativeNum(int num) {
