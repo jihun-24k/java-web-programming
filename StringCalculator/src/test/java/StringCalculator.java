@@ -1,6 +1,6 @@
 public class StringCalculator {
 
-    public int splitStr(String s) {
+    public int addString(String s) {
         String[] nums = {};
         if (isValidStr(s))
             return 0;

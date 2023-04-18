@@ -16,47 +16,47 @@ class StringCalculatorTest {
     @DisplayName("쉼표로 문자열을 나눔")
     @Test
     void splitByComma() {
-        assertSplitStr(6, "1,2,3");
+        assertAddStr(6, "1,2,3");
     }
 
     @DisplayName("콜론으로 문자열을 나눔")
     @Test
     void splitByColon() {
-        assertSplitStr(3, "1:2");
+        assertAddStr(3, "1:2");
     }
 
     @DisplayName("쉼표 또는 콜론으로 문자열을 나눔")
     @Test
     void splitByComma_Or_Colon() {
-        assertSplitStr(6, "1:2,3");
+        assertAddStr(6, "1:2,3");
     }
 
     @DisplayName("빈 문자열이면 0을 반환")
     @Test
     void whenEmptyStr_Then_Return_0 () {
-        assertSplitStr(0, "");
+        assertAddStr(0, "");
     }
 
     @DisplayName("null이면 0을 반환")
     @Test
     void whenStr_IsNull_Then_Return_0 (){
-        assertSplitStr(0, null);
+        assertAddStr(0, null);
     }
 
     @DisplayName("커스텀 구분자로 문자열을 나눔")
     @Test
     void splitByCustomDelimiter() {
-        assertSplitStr(6, "//;\n1;2;3");
+        assertAddStr(6, "//;\n1;2;3");
     }
 
     @DisplayName("음수를 전달하면 예외 처리")
     @Test
     void whenNum_IsMinus_ThenThrowsException() {
-        assertThrows(RuntimeException.class, () -> sc.splitStr("-1,1,2"));
+        assertThrows(RuntimeException.class, () -> sc.addString("-1,1,2"));
     }
 
-    void assertSplitStr(int expectedNum, String s){
-        int realNum = sc.splitStr(s);
+    void assertAddStr(int expectedNum, String s){
+        int realNum = sc.addString(s);
         assertEquals(expectedNum, realNum);
     }
 }
