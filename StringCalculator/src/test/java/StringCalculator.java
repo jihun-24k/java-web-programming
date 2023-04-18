@@ -1,3 +1,6 @@
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class StringCalculator {
 
     public int addString(String s) {
@@ -11,10 +14,10 @@ public class StringCalculator {
     }
 
     private String[] split(String s) {
-        String[] nums = s.split("\\n");
-        if (nums[0].contains("//")){
-            String delimiter = nums[0].substring(2);
-            return nums[1].split(delimiter);
+        Matcher matcher = Pattern.compile("//(.)\\n(.*)").matcher(s);
+        if (matcher.find()) {
+            String delimiter = matcher.group(1);
+            return matcher.group(2).split(delimiter);
         }
 
         return s.split(",|:");
