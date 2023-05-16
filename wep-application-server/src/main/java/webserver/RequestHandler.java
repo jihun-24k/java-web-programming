@@ -1,11 +1,14 @@
 package webserver;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-
+import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +27,15 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            BufferedReader bufferIn = new BufferedReader(new InputStreamReader(in));
+
+            String line = bufferIn.readLine();
+
+            while (!"".equals(line) && line != null) {
+                log.debug("HTTP Header Info = {}", line);
+                line = bufferIn.readLine();
+            }
+
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = "안녕하세요! 웹서버 구축 실습을 하고 있는 김지훈입니다.\n".getBytes();
             response200Header(dos, body.length);
