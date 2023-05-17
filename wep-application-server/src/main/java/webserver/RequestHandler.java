@@ -28,8 +28,8 @@ public class RequestHandler extends Thread {
             BufferedReader bufferIn = new BufferedReader(new InputStreamReader(in));
 
             String line = bufferIn.readLine();
-            String filePath = URLUtils.getFilePath(line);
-            log.debug("file path = {}", filePath);
+            String url = URLUtils.getURL(line);
+            log.debug("url = {}", url);
 
             while (!"".equals(line) && line != null) {
                 log.debug("HTTP Header Info = {}", line);

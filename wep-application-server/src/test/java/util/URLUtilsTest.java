@@ -8,13 +8,13 @@ import org.junit.Test;
 public class URLUtilsTest {
 
     @Test
-    public void get_RequestFilePath() {
+    public void getURL() {
 
         //given
         String requestLine = "GET /index.html HTTP/1.1";
 
         //when
-        String path = URLUtils.getFilePath(requestLine);
+        String path = URLUtils.getURL(requestLine);
 
         //then
         assertEquals("/index.html", path);
