@@ -20,4 +20,12 @@ public class URLUtilsTest {
         assertEquals("/index.html", path);
     }
 
+    @Test
+    public void getParamQuery() {
+
+        String url = "/user/form.html?id=abc123";
+        String paramQuery = URLUtils.getParamQuery(url);
+        assertEquals("id=abc123", paramQuery);
+    }
+
 }
