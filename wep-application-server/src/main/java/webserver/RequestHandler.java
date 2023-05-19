@@ -29,14 +29,7 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader bufferIn = new BufferedReader(new InputStreamReader(in));
 
-            String line = bufferIn.readLine();
-            String url = URLUtils.getURL(line);
-            log.debug("url = {}", url);
-
-            while (!"".equals(line) && line != null) {
-                log.debug("HTTP Header Info = {}", line);
-                line = bufferIn.readLine();
-            }
+            String url = readURL(bufferIn);
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
@@ -45,6 +38,19 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private String readURL(BufferedReader bufferIn) throws IOException {
+        String line = bufferIn.readLine();
+        String url = URLUtils.getURL(line);
+        log.debug("url = {}", url);
+
+        while (!"".equals(line) && line != null) {
+            log.debug("HTTP Header Info = {}", line);
+            line = bufferIn.readLine();
+        }
+
+        return url;
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
