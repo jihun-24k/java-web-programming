@@ -1,5 +1,6 @@
 package webserver;
 
+import db.DataBase;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -9,8 +10,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.Map;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
 import util.URLUtils;
 
 public class RequestHandler extends Thread {
@@ -30,6 +34,22 @@ public class RequestHandler extends Thread {
             BufferedReader bufferIn = new BufferedReader(new InputStreamReader(in));
 
             String url = readURL(bufferIn);
+            url = url.split("\\?")[0];
+
+            String queryParams = URLUtils.getParamQuery(url);
+
+            if (queryParams != null) {
+                Map<String, String> query = HttpRequestUtils.parseQueryString(queryParams);
+
+                User joinUser = new User(
+                    query.get("userId")
+                    ,query.get("password")
+                    ,query.get("name")
+                    ,query.get("email")
+                );
+
+                DataBase.addUser(joinUser);
+            }
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
@@ -49,7 +69,6 @@ public class RequestHandler extends Thread {
             log.debug("HTTP Header Info = {}", line);
             line = bufferIn.readLine();
         }
-
         return url;
     }
 
