@@ -38,18 +38,7 @@ public class RequestHandler extends Thread {
             String requestPath = URLUtils.getRequestPath(url);
             String queryParams = URLUtils.getParamQuery(url);
 
-            if (queryParams != null) {
-                Map<String, String> query = HttpRequestUtils.parseQueryString(queryParams);
-
-                User joinUser = new User(
-                    query.get("userId")
-                    ,query.get("password")
-                    ,query.get("name")
-                    ,query.get("email")
-                );
-
-                DataBase.addUser(joinUser);
-            }
+            saveUser(queryParams);
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
@@ -57,6 +46,21 @@ public class RequestHandler extends Thread {
             responseBody(dos, body);
         } catch (IOException e) {
             log.error(e.getMessage());
+        }
+    }
+
+    private void saveUser(String userData) {
+        if (userData != null) {
+            Map<String, String> query = HttpRequestUtils.parseQueryString(userData);
+
+            User joinUser = new User(
+                query.get("userId")
+                ,query.get("password")
+                ,query.get("name")
+                ,query.get("email")
+            );
+
+            DataBase.addUser(joinUser);
         }
     }
 
