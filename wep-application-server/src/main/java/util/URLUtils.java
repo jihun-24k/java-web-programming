@@ -2,6 +2,14 @@ package util;
 
 public class URLUtils {
 
+    public static String getHTTPMethod(String requestLine) {
+        if (requestLine == null) {
+            return "/";
+        }
+        String[] info = requestLine.split(" ");
+        return info[0];
+    }
+
     public static String getURL(String requestLine) {
         if (requestLine == null) {
             return "/";

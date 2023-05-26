@@ -8,6 +8,15 @@ import org.junit.Test;
 public class URLUtilsTest {
 
     @Test
+    public void getHttpMethod() {
+        String requestLine = "GET /index.html HTTP/1.1";
+
+        String httpMethod = URLUtils.getHTTPMethod(requestLine);
+
+        assertEquals("GET", httpMethod);
+    }
+
+    @Test
     public void getURL() {
 
         //given
