@@ -7,7 +7,7 @@ import util.URLUtils;
 public class RequestHeader {
     private String url;
     private String httpMethod;
-    private int contentLength;
+    private int contentLength = 0;
 
     public RequestHeader(BufferedReader inputStream) throws IOException {
         readHeader(inputStream);
@@ -20,6 +20,25 @@ public class RequestHeader {
 
         while (!"".equals(line) && line != null) {
             line = bufferIn.readLine();
+            readContentLength(line);
         }
+    }
+
+    private void readContentLength(String line) {
+        if (line.contains("Content-Length")) {
+            contentLength = Integer.parseInt(line.split(" ")[1]);
+        }
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getHttpMethod() {
+        return httpMethod;
+    }
+
+    public int getContentLength() {
+        return contentLength;
     }
 }

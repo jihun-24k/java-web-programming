@@ -1,6 +1,7 @@
 package webserver;
 
 import db.DataBase;
+import http.RequestHeader;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -15,6 +16,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import util.IOUtils;
 import util.URLUtils;
 
 public class RequestHandler extends Thread {
@@ -33,10 +35,16 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader bufferIn = new BufferedReader(new InputStreamReader(in));
 
-            String url = readURL(bufferIn);
+            RequestHeader requestHeader = new RequestHeader(bufferIn);
+
+            String url = requestHeader.getUrl();
+            String httpMethod = requestHeader.getHttpMethod();
 
             String requestPath = URLUtils.getRequestPath(url);
             String queryParams = URLUtils.getParamQuery(url);
+            if (httpMethod.equals("POST")) {
+                queryParams = IOUtils.readData(bufferIn, requestHeader.getContentLength());
+            }
 
             saveUser(queryParams);
 
@@ -62,18 +70,6 @@ public class RequestHandler extends Thread {
 
             DataBase.addUser(joinUser);
         }
-    }
-
-    private String readURL(BufferedReader bufferIn) throws IOException {
-        String line = bufferIn.readLine();
-        String url = URLUtils.getURL(line);
-        log.debug("url = {}", url);
-
-        while (!"".equals(line) && line != null) {
-            log.debug("HTTP Header Info = {}", line);
-            line = bufferIn.readLine();
-        }
-        return url;
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
