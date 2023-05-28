@@ -49,8 +49,16 @@ public class RequestHandler extends Thread {
             saveUser(queryParams);
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
-            response200Header(dos, body.length);
+            byte[] body = {};
+
+            if (requestPath.equals("/user/create")) {
+                response302Header(dos);
+            }
+            else {
+                body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
+                response200Header(dos, body.length);
+            }
+
             responseBody(dos, body);
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -69,6 +77,16 @@ public class RequestHandler extends Thread {
             );
 
             DataBase.addUser(joinUser);
+        }
+    }
+
+    private void response302Header(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: http://localhost:8080/index.html\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
     }
 
