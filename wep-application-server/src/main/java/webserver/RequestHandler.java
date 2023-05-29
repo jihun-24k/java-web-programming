@@ -41,29 +41,36 @@ public class RequestHandler extends Thread {
             String httpMethod = requestHeader.getHttpMethod();
 
             String requestPath = URLUtils.getRequestPath(url);
-            String queryParams = URLUtils.getParamQuery(url);
-            if (httpMethod.equals("POST")) {
-                queryParams = IOUtils.readData(bufferIn, requestHeader.getContentLength());
-            }
 
-            saveUser(queryParams);
+            if (httpMethod.equals("POST")) {
+                String queryParams = IOUtils.readData(bufferIn, requestHeader.getContentLength());
+                saveUser(queryParams);
+            }
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = {};
-
-            if (requestPath.equals("/user/create")) {
-                response302Header(dos);
-            }
-            else {
-                body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
-                response200Header(dos, body.length);
-            }
+            byte[] body = responseHeader(dos, requestPath);
 
             responseBody(dos, body);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
+
+    private byte[] responseHeader(DataOutputStream dos, String requestPath)
+        throws IOException {
+        byte[] body = {};
+
+        if (requestPath.equals("/user/create")) {
+            response302Header(dos);
+        }
+        else {
+            body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
+            response200Header(dos, body.length);
+        }
+
+        return body;
+    }
+
 
     private void saveUser(String userData) {
         if (userData != null) {
