@@ -41,10 +41,11 @@ public class RequestHandler extends Thread {
             String httpMethod = requestHeader.getHttpMethod();
 
             String requestPath = URLUtils.getRequestPath(url);
+            String queryParams = URLUtils.getParamQuery(url);
 
             if (httpMethod.equals("POST")) {
-                String queryParams = IOUtils.readData(bufferIn, requestHeader.getContentLength());
-                saveUser(queryParams);
+                String requestBody = IOUtils.readData(bufferIn, requestHeader.getContentLength());
+                saveUser(requestBody);
             }
 
             DataOutputStream dos = new DataOutputStream(out);
@@ -62,6 +63,10 @@ public class RequestHandler extends Thread {
 
         if (requestPath.equals("/user/create")) {
             response302Header(dos);
+        }
+
+        if (requestPath.equals("/user/login")) {
+
         }
         else {
             body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
