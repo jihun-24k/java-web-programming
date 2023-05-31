@@ -42,14 +42,14 @@ public class RequestHandler extends Thread {
 
             String requestPath = URLUtils.getRequestPath(url);
             String queryParams = URLUtils.getParamQuery(url);
+            String requestBody = "";
 
             if (httpMethod.equals("POST")) {
-                String requestBody = IOUtils.readData(bufferIn, requestHeader.getContentLength());
-                saveUser(requestBody);
+                requestBody = IOUtils.readData(bufferIn, requestHeader.getContentLength());
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = responseHeader(dos, requestPath);
+            byte[] body = responseHeader(dos, requestPath, requestBody);
 
             responseBody(dos, body);
         } catch (IOException e) {
@@ -57,16 +57,23 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private byte[] responseHeader(DataOutputStream dos, String requestPath)
+    private byte[] responseHeader(DataOutputStream dos, String requestPath, String requestBody)
         throws IOException {
         byte[] body = {};
+        Map<String, String> query = HttpRequestUtils.parseQueryString(requestBody);
 
         if (requestPath.equals("/user/create")) {
+            saveUser(query);
             response302Header(dos);
         }
 
         if (requestPath.equals("/user/login")) {
-
+            if (ExistUser(query)) {
+                responseLogin(dos);
+            }
+            else {
+                responseLoginFail(dos);
+            }
         }
         else {
             body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
@@ -76,20 +83,41 @@ public class RequestHandler extends Thread {
         return body;
     }
 
+    private boolean ExistUser(Map<String, String> query) {
+        User findUser = DataBase.findUserById(query.get("userId"));
 
-    private void saveUser(String userData) {
-        if (userData != null) {
-            Map<String, String> query = HttpRequestUtils.parseQueryString(userData);
+        if (findUser == null) {
+            return false;
+        }
+        return true;
+    }
 
-            User joinUser = new User(
+
+    private void saveUser(Map<String, String> query) {
+
+        User joinUser = new User(
                 query.get("userId")
                 ,query.get("password")
                 ,query.get("name")
                 ,query.get("email")
-            );
+        );
 
-            DataBase.addUser(joinUser);
+        DataBase.addUser(joinUser);
+    }
+
+    private void responseLogin(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/html\r\n");
+            dos.writeBytes("Set-Cookie: logined=true\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
+    }
+
+    private void responseLoginFail(DataOutputStream dos) {
+
     }
 
     private void response302Header(DataOutputStream dos) {
