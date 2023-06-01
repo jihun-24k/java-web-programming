@@ -68,7 +68,7 @@ public class RequestHandler extends Thread {
         }
 
         if (requestPath.equals("/user/login")) {
-            if (ExistUser(query)) {
+            if (canLogin(query)) {
                 responseLogin(dos);
             }
             else {
@@ -83,12 +83,17 @@ public class RequestHandler extends Thread {
         return body;
     }
 
-    private boolean ExistUser(Map<String, String> query) {
+    private boolean canLogin(Map<String, String> query) {
         User findUser = DataBase.findUserById(query.get("userId"));
 
         if (findUser == null) {
             return false;
         }
+
+        if (!findUser.getPassword().equals(query.get("password"))) {
+            return false;
+        }
+
         return true;
     }
 
@@ -108,6 +113,7 @@ public class RequestHandler extends Thread {
     private void responseLogin(DataOutputStream dos) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Location: http://localhost:8080/index.html\r\n");
             dos.writeBytes("Content-Type: text/html\r\n");
             dos.writeBytes("Set-Cookie: logined=true\r\n");
             dos.writeBytes("\r\n");
