@@ -122,7 +122,14 @@ public class RequestHandler extends Thread {
     }
 
     private void responseLoginFail(DataOutputStream dos) {
-
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: http://localhost:8080/user/login_failed.html\r\n");
+            dos.writeBytes("Set-Cookie: logined=false; Path=/\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
     }
 
     private void response302Header(DataOutputStream dos) {
