@@ -9,6 +9,8 @@ public class RequestHeader {
     private String httpMethod;
     private int contentLength = 0;
 
+    private String cookies;
+
     public RequestHeader(BufferedReader inputStream) throws IOException {
         readHeader(inputStream);
     }
@@ -21,12 +23,19 @@ public class RequestHeader {
         while (!"".equals(line) && line != null) {
             line = bufferIn.readLine();
             readContentLength(line);
+            readCookies(line);
         }
     }
 
     private void readContentLength(String line) {
         if (line.contains("Content-Length")) {
             contentLength = Integer.parseInt(line.split(" ")[1]);
+        }
+    }
+
+    private void readCookies(String line) {
+        if (line.contains("Cookie")) {
+            cookies = line.split(": ")[1];
         }
     }
 
@@ -40,5 +49,9 @@ public class RequestHeader {
 
     public int getContentLength() {
         return contentLength;
+    }
+
+    public String getCookies() {
+        return cookies;
     }
 }

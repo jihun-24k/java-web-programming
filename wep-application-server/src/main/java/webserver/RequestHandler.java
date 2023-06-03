@@ -42,6 +42,7 @@ public class RequestHandler extends Thread {
 
             String requestPath = URLUtils.getRequestPath(url);
             String queryParams = URLUtils.getParamQuery(url);
+            Map<String, String> cookies = HttpRequestUtils.parseCookies(requestHeader.getCookies());
             String requestBody = "";
 
             if (httpMethod.equals("POST")) {
@@ -49,7 +50,7 @@ public class RequestHandler extends Thread {
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = responseHeader(dos, requestPath, requestBody);
+            byte[] body = responseHeader(dos, requestPath, requestBody, cookies);
 
             responseBody(dos, body);
         } catch (IOException e) {
@@ -57,7 +58,7 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private byte[] responseHeader(DataOutputStream dos, String requestPath, String requestBody)
+    private byte[] responseHeader(DataOutputStream dos, String requestPath, String requestBody, Map<String, String> cookies)
         throws IOException {
         byte[] body = {};
         Map<String, String> query = HttpRequestUtils.parseQueryString(requestBody);
@@ -69,12 +70,25 @@ public class RequestHandler extends Thread {
 
         if (requestPath.equals("/user/login")) {
             if (canLogin(query)) {
-                responseLogin(dos);
+                responseLoginSuccess(dos);
             }
             else {
                 responseLoginFail(dos);
             }
         }
+
+        if (requestPath.equals("/user/list")) {
+            String loginedCookie = cookies.get("logined");
+            boolean logined = Boolean.parseBoolean(loginedCookie);
+            if (logined) {
+
+            }
+            else {
+                responseLogin(dos);
+            }
+        }
+
+
         else {
             body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
             response200Header(dos, body.length);
@@ -110,7 +124,7 @@ public class RequestHandler extends Thread {
         DataBase.addUser(joinUser);
     }
 
-    private void responseLogin(DataOutputStream dos) {
+    private void responseLoginSuccess(DataOutputStream dos) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: http://localhost:8080/index.html\r\n");
@@ -126,6 +140,16 @@ public class RequestHandler extends Thread {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: http://localhost:8080/user/login_failed.html\r\n");
             dos.writeBytes("Set-Cookie: logined=false; Path=/\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void responseLogin(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: http://localhost:8080/user/login.html\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
