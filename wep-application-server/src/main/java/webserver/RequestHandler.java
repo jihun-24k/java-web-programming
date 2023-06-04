@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.Map;
 import model.User;
 import org.slf4j.Logger;
@@ -81,7 +82,19 @@ public class RequestHandler extends Thread {
             String loginedCookie = cookies.get("logined");
             boolean logined = Boolean.parseBoolean(loginedCookie);
             if (logined) {
-
+                Collection<User> users = DataBase.findAll();
+                StringBuilder sb = new StringBuilder();
+                sb.append("<table border = '1'>");
+                for (User user : users) {
+                    sb.append("<tr>");
+                    sb.append("<td>" + user.getUserId() + "</td>");
+                    sb.append("<td>" + user.getName() + "</td>");
+                    sb.append("<td>" + user.getEmail() + "</td>");
+                    sb.append("</tr>");
+                }
+                sb.append("</table>");
+                body = sb.toString().getBytes();
+                response200Header(dos, body.length);
             }
             else {
                 responseLogin(dos);
