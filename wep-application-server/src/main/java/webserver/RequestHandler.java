@@ -68,8 +68,11 @@ public class RequestHandler extends Thread {
             saveUser(query);
             response302Header(dos);
         }
-
-        if (requestPath.equals("/user/login")) {
+        else if (requestPath.endsWith(".css")) {
+            body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
+            response200CssHeader(dos, body.length);
+        }
+        else if (requestPath.equals("/user/login")) {
             if (canLogin(query)) {
                 responseLoginSuccess(dos);
             }
@@ -77,8 +80,7 @@ public class RequestHandler extends Thread {
                 responseLoginFail(dos);
             }
         }
-
-        if (requestPath.equals("/user/list")) {
+        else if (requestPath.equals("/user/list")) {
             String loginedCookie = cookies.get("logined");
             boolean logined = Boolean.parseBoolean(loginedCookie);
             if (logined) {
@@ -100,7 +102,6 @@ public class RequestHandler extends Thread {
                 responseLogin(dos);
             }
         }
-
 
         else {
             body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
@@ -183,6 +184,17 @@ public class RequestHandler extends Thread {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response200CssHeader(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/css;\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
