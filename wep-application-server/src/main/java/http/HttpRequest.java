@@ -4,14 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import util.URLUtils;
 
-public class RequestHeader {
+public class HttpRequest {
     private String url;
     private String httpMethod;
     private int contentLength = 0;
 
     private String cookies;
 
-    public RequestHeader(BufferedReader inputStream) throws IOException {
+    public HttpRequest(BufferedReader inputStream) throws IOException {
         readHeader(inputStream);
     }
 

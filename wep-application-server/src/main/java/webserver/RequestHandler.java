@@ -1,7 +1,7 @@
 package webserver;
 
 import db.DataBase;
-import http.RequestHeader;
+import http.HttpRequest;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -36,18 +36,18 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader bufferIn = new BufferedReader(new InputStreamReader(in));
 
-            RequestHeader requestHeader = new RequestHeader(bufferIn);
+            HttpRequest httpRequest = new HttpRequest(bufferIn);
 
-            String url = requestHeader.getUrl();
-            String httpMethod = requestHeader.getHttpMethod();
+            String url = httpRequest.getUrl();
+            String httpMethod = httpRequest.getHttpMethod();
 
             String requestPath = URLUtils.getRequestPath(url);
             String queryParams = URLUtils.getParamQuery(url);
-            Map<String, String> cookies = HttpRequestUtils.parseCookies(requestHeader.getCookies());
+            Map<String, String> cookies = HttpRequestUtils.parseCookies(httpRequest.getCookies());
             String requestBody = "";
 
             if (httpMethod.equals("POST")) {
-                requestBody = IOUtils.readData(bufferIn, requestHeader.getContentLength());
+                requestBody = IOUtils.readData(bufferIn, httpRequest.getContentLength());
             }
 
             DataOutputStream dos = new DataOutputStream(out);
