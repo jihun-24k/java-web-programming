@@ -28,4 +28,12 @@ public class URLUtilsTest {
         assertEquals("id=abc123", paramQuery);
     }
 
+    @Test
+    public void getRequestPath(){
+
+        String url = "/user/form.html?id=abc123";
+        String requestPath = URLUtils.getRequestPath(url);
+        assertEquals("/user/form.html", requestPath);
+    }
+
 }

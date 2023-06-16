@@ -17,4 +17,9 @@ public class URLUtils {
         }
         return info[1];
     }
+
+    public static String getRequestPath(String url) {
+        String[] info = url.split("\\?");
+        return info[0];
+    }
 }
