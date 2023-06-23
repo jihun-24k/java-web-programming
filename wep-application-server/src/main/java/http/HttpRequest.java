@@ -2,56 +2,94 @@ package http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import util.URLUtils;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import util.HttpRequestUtils;
+import util.IOUtils;
 
 public class HttpRequest {
+    private String method;
     private String url;
-    private String httpMethod;
-    private int contentLength = 0;
+    private String path;
 
-    private String cookies;
+    private Map<String, String> header = new HashMap<>();
+    private Map<String, String> parameter = new HashMap<>();
 
-    public HttpRequest(BufferedReader inputStream) throws IOException {
-        readHeader(inputStream);
+    private Map<String, String> cookie = new HashMap<>();
+
+    public HttpRequest(InputStream in) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+        readHeader(bufferedReader);
+        readParam(bufferedReader);
     }
 
     private void readHeader(BufferedReader bufferIn) throws IOException {
         String line = bufferIn.readLine();
-        this.httpMethod = URLUtils.getHTTPMethod(line);
-        this.url = URLUtils.getURL(line);
+        readRequestLine(line);
 
         while (!"".equals(line) && line != null) {
             line = bufferIn.readLine();
-            readContentLength(line);
-            readCookies(line);
+            readHeaderInfo(line);
+        }
+        readCookie(header.get("Cookie"));
+    }
+
+    private void readRequestLine(String line) {
+        String[] tokens = line.split(" ");
+        method = tokens[0];
+        url = tokens[1];
+    }
+
+    private void readHeaderInfo(String line) {
+        if (line == null) {
+            return;
+        }
+        String[] keyValue = line.split(":");
+        String key = keyValue[0].trim();
+        String value = keyValue[1].trim();
+
+        header.put(key, value);
+    }
+
+    private void readCookie(String cookies) {
+        cookie = HttpRequestUtils.parseCookies(cookies);
+    }
+
+    private void readParam(BufferedReader bufferIn) throws IOException {
+        if (method.equals("GET")) {
+            String[] tokens = url.split("\\?");
+            path = tokens[0];
+            String quaryString = tokens[1];
+            parameter = HttpRequestUtils.parseQueryString(quaryString);
+        }
+
+        if (method.equals("POST")) {
+            path = url;
+            int contentLength = Integer.parseInt(header.get("Content-Length"));
+            String quaryString = IOUtils.readData(bufferIn, contentLength);
+            parameter = HttpRequestUtils.parseQueryString(quaryString);
         }
     }
 
-    private void readContentLength(String line) {
-        if (line.contains("Content-Length")) {
-            contentLength = Integer.parseInt(line.split(" ")[1]);
-        }
+    public String getMethod() {
+        return method;
     }
 
-    private void readCookies(String line) {
-        if (line.contains("Cookie")) {
-            cookies = line.split(": ")[1];
-        }
+    public String getPath() {
+        return path;
     }
 
-    public String getUrl() {
-        return url;
+    public String getHeader(String key) {
+        return header.get(key);
     }
 
-    public String getHttpMethod() {
-        return httpMethod;
+    public String getParameter(String key) {
+        return parameter.get(key);
     }
 
-    public int getContentLength() {
-        return contentLength;
-    }
-
-    public String getCookies() {
-        return cookies;
+    public String getCookie(String key) {
+        return cookie.get(key);
     }
 }

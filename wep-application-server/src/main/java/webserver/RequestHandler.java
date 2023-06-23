@@ -2,12 +2,10 @@ package webserver;
 
 import db.DataBase;
 import http.HttpRequest;
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -18,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 import util.IOUtils;
-import util.URLUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -34,24 +31,62 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader bufferIn = new BufferedReader(new InputStreamReader(in));
 
-            HttpRequest httpRequest = new HttpRequest(bufferIn);
-
-            String url = httpRequest.getUrl();
-            String httpMethod = httpRequest.getHttpMethod();
-
-            String requestPath = URLUtils.getRequestPath(url);
-            String queryParams = URLUtils.getParamQuery(url);
-            Map<String, String> cookies = HttpRequestUtils.parseCookies(httpRequest.getCookies());
-            String requestBody = "";
-
-            if (httpMethod.equals("POST")) {
-                requestBody = IOUtils.readData(bufferIn, httpRequest.getContentLength());
-            }
+            HttpRequest httpRequest = new HttpRequest(in);
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = responseHeader(dos, requestPath, requestBody, cookies);
+            byte[] body = {};
+
+            if (httpRequest.getPath().equals("/user/create")) {
+                User joinUser = new User(
+                    httpRequest.getParameter("userId")
+                    ,httpRequest.getParameter("password")
+                    ,httpRequest.getParameter("name")
+                    ,httpRequest.getParameter("email")
+                );
+
+                DataBase.addUser(joinUser);
+                response302Header(dos);
+            }
+            else if (httpRequest.getPath().endsWith(".css")) {
+                body = Files.readAllBytes(new File("./webapp" + httpRequest.getPath()).toPath());
+                response200CssHeader(dos, body.length);
+            }
+            else if (httpRequest.getPath().equals("/user/login")) {
+                if (canLogin(httpRequest)) {
+                    responseLoginSuccess(dos);
+                }
+                else {
+                    responseLoginFail(dos);
+                }
+            }
+            else if (httpRequest.getPath().equals("/user/list")) {
+                String loginedCookie = httpRequest.getCookie("logined");
+                boolean logined = Boolean.parseBoolean(loginedCookie);
+                if (logined) {
+                    Collection<User> users = DataBase.findAll();
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("<table border = '1'>");
+                    for (User user : users) {
+                        sb.append("<tr>");
+                        sb.append("<td>" + user.getUserId() + "</td>");
+                        sb.append("<td>" + user.getName() + "</td>");
+                        sb.append("<td>" + user.getEmail() + "</td>");
+                        sb.append("</tr>");
+                    }
+                    sb.append("</table>");
+                    body = sb.toString().getBytes();
+                    response200Header(dos, body.length);
+                }
+                else {
+                    responseLogin(dos);
+                }
+            }
+
+            else {
+                body = Files.readAllBytes(new File("./webapp" + httpRequest.getPath()).toPath());
+                response200Header(dos, body.length);
+            }
 
             responseBody(dos, body);
         } catch (IOException e) {
@@ -59,66 +94,14 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private byte[] responseHeader(DataOutputStream dos, String requestPath, String requestBody, Map<String, String> cookies)
-        throws IOException {
-        byte[] body = {};
-        Map<String, String> query = HttpRequestUtils.parseQueryString(requestBody);
-
-        if (requestPath.equals("/user/create")) {
-            saveUser(query);
-            response302Header(dos);
-        }
-        else if (requestPath.endsWith(".css")) {
-            body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
-            response200CssHeader(dos, body.length);
-        }
-        else if (requestPath.equals("/user/login")) {
-            if (canLogin(query)) {
-                responseLoginSuccess(dos);
-            }
-            else {
-                responseLoginFail(dos);
-            }
-        }
-        else if (requestPath.equals("/user/list")) {
-            String loginedCookie = cookies.get("logined");
-            boolean logined = Boolean.parseBoolean(loginedCookie);
-            if (logined) {
-                Collection<User> users = DataBase.findAll();
-                StringBuilder sb = new StringBuilder();
-                sb.append("<table border = '1'>");
-                for (User user : users) {
-                    sb.append("<tr>");
-                    sb.append("<td>" + user.getUserId() + "</td>");
-                    sb.append("<td>" + user.getName() + "</td>");
-                    sb.append("<td>" + user.getEmail() + "</td>");
-                    sb.append("</tr>");
-                }
-                sb.append("</table>");
-                body = sb.toString().getBytes();
-                response200Header(dos, body.length);
-            }
-            else {
-                responseLogin(dos);
-            }
-        }
-
-        else {
-            body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
-            response200Header(dos, body.length);
-        }
-
-        return body;
-    }
-
-    private boolean canLogin(Map<String, String> query) {
-        User findUser = DataBase.findUserById(query.get("userId"));
+    private boolean canLogin(HttpRequest httpRequest) {
+        User findUser = DataBase.findUserById(httpRequest.getParameter("userId"));
 
         if (findUser == null) {
             return false;
         }
 
-        if (!findUser.getPassword().equals(query.get("password"))) {
+        if (!findUser.getPassword().equals(httpRequest.getParameter("password"))) {
             return false;
         }
 
