@@ -43,7 +43,7 @@ public class HttpRequest {
     }
 
     private void readHeaderInfo(String line) {
-        if (line == null) {
+        if ("".equals(line) || line == null) {
             return;
         }
         String[] keyValue = line.split(":");
