@@ -112,10 +112,9 @@ public class RequestHandler extends Thread {
 
     private void responseLogin(DataOutputStream dos) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: http://localhost:8080/index.html\r\n");
-            dos.writeBytes("Content-Type: text/html\r\n");
-            dos.writeBytes("Set-Cookie: logined=true\r\n");
+            dos.writeBytes("Set-Cookie: logined=true; Path=/\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
