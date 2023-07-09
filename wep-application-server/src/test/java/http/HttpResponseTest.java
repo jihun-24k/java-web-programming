@@ -13,8 +13,8 @@ public class HttpResponseTest {
     private String testDirectory = "./src/test/resources/";
 
     @Test
-    public void responseForward() {
-        HttpResponse response = new HttpResponse(createOutputStream(Http_Forward.txt));
+    public void responseForward() throws Exception {
+        HttpResponse response = new HttpResponse(createOutputStream("Http_Forward.txt"));
         response.forward("/index.html");
     }
 
