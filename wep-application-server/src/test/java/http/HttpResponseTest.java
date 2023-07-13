@@ -18,6 +18,12 @@ public class HttpResponseTest {
         response.forward("/index.html");
     }
 
+    @Test
+    public void responseRedirect() throws Exception {
+        HttpResponse response = new HttpResponse(createOutputStream("Http_Redirect.txt"));
+        response.redirect("/index.html");
+    }
+
     private OutputStream createOutputStream(String fileName) throws FileNotFoundException {
         return new FileOutputStream(new File(testDirectory + fileName));
     }
