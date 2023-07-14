@@ -25,22 +25,37 @@ public class HttpResponse {
 
     public void forward(String url) throws IOException {
         body = Files.readAllBytes(new File("./webapp" + url).toPath());
-        response200Header(dos, body.length);
-        responseBody(dos, body);
+        response200Header();
+        responseBody();
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    public void sendRedirect(String url) {
+        response302Header(url);
+        responseBody();
+    }
+
+    private void response200Header() {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("Content-Length: " + body.length + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
+    private void response302Header(String url) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: http://localhost:8080" + url + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void responseBody() {
         try {
             dos.write(body, 0, body.length);
             dos.flush();

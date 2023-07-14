@@ -1,7 +1,5 @@
 package http;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,7 +19,7 @@ public class HttpResponseTest {
     @Test
     public void responseRedirect() throws Exception {
         HttpResponse response = new HttpResponse(createOutputStream("Http_Redirect.txt"));
-        response.redirect("/index.html");
+        response.sendRedirect("/index.html");
     }
 
     private OutputStream createOutputStream(String fileName) throws FileNotFoundException {
