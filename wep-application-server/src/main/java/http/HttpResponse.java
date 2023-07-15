@@ -17,28 +17,35 @@ public class HttpResponse {
     private DataOutputStream dos;
     private Map<String, String> header = new HashMap<>();
 
-    private byte[] body = {};
 
     public HttpResponse(OutputStream out) {
         dos = new DataOutputStream(out);
     }
 
     public void forward(String url) throws IOException {
-        body = Files.readAllBytes(new File("./webapp" + url).toPath());
-        response200Header();
-        responseBody();
+        byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+        if (url.endsWith(".css")) {
+            addHeader("Content-Type", "text/css;");
+        }
+        response200Header(body.length);
+        responseBody(body);
+    }
+
+    private void addHeader(String key, String value) {
+        header.put(key, value);
     }
 
     public void sendRedirect(String url) {
+        byte[] body = {};
         response302Header(url);
-        responseBody();
+        responseBody(body);
     }
 
-    private void response200Header() {
+    private void response200Header(int lengthOfContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + body.length + "\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -55,7 +62,7 @@ public class HttpResponse {
         }
     }
 
-    private void responseBody() {
+    private void responseBody(byte[] body) {
         try {
             dos.write(body, 0, body.length);
             dos.flush();
