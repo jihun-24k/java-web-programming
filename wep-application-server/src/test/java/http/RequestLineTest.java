@@ -1,8 +1,7 @@
 package http;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 
@@ -27,5 +26,10 @@ public class RequestLineTest {
 
         Map<String, String> params = line.getParams();
         assertEquals(2, params.size());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void invalid_form() {
+        RequestLine line = new RequestLine("GET /index.html HTTP/1.1 HTML");
     }
 }
