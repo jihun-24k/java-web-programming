@@ -35,7 +35,7 @@ public class HttpRequest {
 
             readHeader(bufferedReader);
             readCookie(headers.get("Cookie"));
-            if ("POST".equals(getMethod())) {
+            if (getMethod().isPost()) {
                 int contentLength = Integer.parseInt(headers.get("Content-Length"));
                 String body = IOUtils.readData(bufferedReader, contentLength);
                 params = HttpRequestUtils.parseQueryString(body);
@@ -71,7 +71,7 @@ public class HttpRequest {
         this.cookies = HttpRequestUtils.parseCookies(cookies);
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return requestLine.getMethod();
     }
 

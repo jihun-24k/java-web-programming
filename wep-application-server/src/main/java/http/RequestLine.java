@@ -8,7 +8,7 @@ import util.HttpRequestUtils;
 
 public class RequestLine {
     private static final Logger log = LoggerFactory.getLogger(RequestLine.class);
-    private String method;
+    private HttpMethod method;
     private String path;
     private Map<String, String> params = new HashMap<>();
 
@@ -19,7 +19,7 @@ public class RequestLine {
             throw new IllegalArgumentException(requestLine + "이 형식에 맞지 않습니다.");
         }
 
-        method = tokens[0];
+        method = HttpMethod.valueOf(tokens[0]);
 
         int index = tokens[1].indexOf("?");
         if (index == -1) {
@@ -31,7 +31,7 @@ public class RequestLine {
         }
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 
