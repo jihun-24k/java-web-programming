@@ -31,11 +31,12 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
             HttpRequest httpRequest = new HttpRequest(in);
+            String path = getDefaultPath(httpRequest.getPath());
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = {};
 
-            if (httpRequest.getPath().equals("/user/create")) {
+            if (path.equals("/user/create")) {
                 User joinUser = new User(
                     httpRequest.getParameter("userId")
                     ,httpRequest.getParameter("password")
@@ -46,11 +47,11 @@ public class RequestHandler extends Thread {
                 DataBase.addUser(joinUser);
                 response302Header(dos);
             }
-            else if (httpRequest.getPath().endsWith(".css")) {
+            else if (path.endsWith(".css")) {
                 body = Files.readAllBytes(new File("./webapp" + httpRequest.getPath()).toPath());
                 response200CssHeader(dos, body.length);
             }
-            else if (httpRequest.getPath().equals("/user/login")) {
+            else if (path.equals("/user/login")) {
                 if (canLogin(httpRequest)) {
                     responseLoginSuccess(dos);
                 }
@@ -58,7 +59,7 @@ public class RequestHandler extends Thread {
                     responseLoginFail(dos);
                 }
             }
-            else if (httpRequest.getPath().equals("/user/list")) {
+            else if (path.equals("/user/list")) {
                 String loginedCookie = httpRequest.getCookie("logined");
                 boolean logined = Boolean.parseBoolean(loginedCookie);
                 if (logined) {
@@ -92,6 +93,13 @@ public class RequestHandler extends Thread {
         }
     }
 
+    private String getDefaultPath(String path) {
+        if (path.equals("/")) {
+            return "/index.html";
+        }
+        return path;
+    }
+
     private boolean canLogin(HttpRequest httpRequest) {
         User findUser = DataBase.findUserById(httpRequest.getParameter("userId"));
 
@@ -104,19 +112,6 @@ public class RequestHandler extends Thread {
         }
 
         return true;
-    }
-
-
-    private void saveUser(Map<String, String> query) {
-
-        User joinUser = new User(
-                query.get("userId")
-                ,query.get("password")
-                ,query.get("name")
-                ,query.get("email")
-        );
-
-        DataBase.addUser(joinUser);
     }
 
     private void responseLoginSuccess(DataOutputStream dos) {
