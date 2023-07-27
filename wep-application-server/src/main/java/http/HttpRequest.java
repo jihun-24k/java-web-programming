@@ -90,4 +90,8 @@ public class HttpRequest {
     public String getCookie(String key) {
         return cookies.get(key);
     }
+
+    public boolean isLogin(String logined) {
+        return Boolean.parseBoolean(getCookie(logined));
+    }
 }

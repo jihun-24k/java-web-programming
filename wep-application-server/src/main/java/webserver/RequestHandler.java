@@ -60,9 +60,7 @@ public class RequestHandler extends Thread {
                 }
             }
             else if (path.equals("/user/list")) {
-                String loginedCookie = httpRequest.getCookie("logined");
-                boolean logined = Boolean.parseBoolean(loginedCookie);
-                if (logined) {
+                if (httpRequest.isLogin("logined")) {
                     Collection<User> users = DataBase.findAll();
                     StringBuilder sb = new StringBuilder();
                     sb.append("<table border = '1'>");
