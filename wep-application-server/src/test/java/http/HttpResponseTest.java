@@ -22,6 +22,13 @@ public class HttpResponseTest {
         response.sendRedirect("/index.html");
     }
 
+    @Test
+    public void responseCookie() throws Exception {
+        HttpResponse response = new HttpResponse(createOutputStream("Http_Cookie.txt"));
+        response.addHeader("Set-Cookie", "logined=true");
+        response.sendRedirect("/index.html");
+    }
+
     private OutputStream createOutputStream(String fileName) throws FileNotFoundException {
         return new FileOutputStream(new File(testDirectory + fileName));
     }

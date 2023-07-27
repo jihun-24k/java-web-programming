@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +51,7 @@ public class HttpResponse {
         responseBody(contents);
     }
 
-    private void addHeader(String key, String value) {
+    public void addHeader(String key, String value) {
         header.put(key, value);
     }
 
