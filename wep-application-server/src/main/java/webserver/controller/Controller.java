@@ -1,7 +1,8 @@
 package webserver.controller;
 
+import http.HttpRequest;
 import http.HttpResponse;
 
 public interface Controller {
-    void service(HttpResponse request, HttpResponse response);
+    void service(HttpRequest request, HttpResponse response);
 }
