@@ -92,6 +92,9 @@ public class HttpRequest {
     }
 
     public boolean isLogin(String logined) {
+        if (getCookie(logined) == null) {
+            return false;
+        }
         return Boolean.parseBoolean(getCookie(logined));
     }
 }
