@@ -11,6 +11,7 @@ import java.util.Collection;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.controller.Controller;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -27,52 +28,16 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
-            HttpRequest httpRequest = new HttpRequest(in);
-            String path = getDefaultPath(httpRequest.getPath());
-
+            HttpRequest request = new HttpRequest(in);
             HttpResponse response = new HttpResponse(out);
 
-            if (path.equals("/user/create")) {
-                User joinUser = new User(
-                    httpRequest.getParameter("userId")
-                    ,httpRequest.getParameter("password")
-                    ,httpRequest.getParameter("name")
-                    ,httpRequest.getParameter("email")
-                );
-
-                DataBase.addUser(joinUser);
-                response.sendRedirect("/index.html");
-            }
-            else if (path.equals("/user/login")) {
-                if (canLogin(httpRequest)) {
-                    response.addHeader("Set-Cookie", "logined=true");
-                    response.sendRedirect("/index.html");
-                }
-                else {
-                    response.sendRedirect("/login_failed.html");
-                }
-            }
-            else if (path.equals("/user/list")) {
-                if (httpRequest.isLogin("logined")) {
-                    Collection<User> users = DataBase.findAll();
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("<table border = '1'>");
-                    for (User user : users) {
-                        sb.append("<tr>");
-                        sb.append("<td>" + user.getUserId() + "</td>");
-                        sb.append("<td>" + user.getName() + "</td>");
-                        sb.append("<td>" + user.getEmail() + "</td>");
-                        sb.append("</tr>");
-                    }
-                    sb.append("</table>");
-                    response.forwardBody(sb.toString());
-                }
-                else {
-                    response.sendRedirect("/user/login.html");
-                }
+            Controller controller = RequestMapping.getControllers(request.getPath());
+            if (controller == null) {
+                String path = getDefaultPath(request.getPath());
+                response.forward(path);
             }
             else {
-                response.forward(path);
+                controller.service(request, response);
             }
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -84,19 +49,5 @@ public class RequestHandler extends Thread {
             return "/index.html";
         }
         return path;
-    }
-
-    private boolean canLogin(HttpRequest httpRequest) {
-        User findUser = DataBase.findUserById(httpRequest.getParameter("userId"));
-
-        if (findUser == null) {
-            return false;
-        }
-
-        if (!findUser.getPassword().equals(httpRequest.getParameter("password"))) {
-            return false;
-        }
-
-        return true;
     }
 }
