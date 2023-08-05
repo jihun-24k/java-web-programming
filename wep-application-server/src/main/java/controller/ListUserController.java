@@ -10,7 +10,7 @@ public class ListUserController extends AbstractController{
 
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
-        if (request.isLogin("logined")) {
+        if (request.getCookies().isLogin("logined")) {
             Collection<User> users = DataBase.findAll();
             StringBuilder sb = new StringBuilder();
             sb.append("<table border = '1'>");

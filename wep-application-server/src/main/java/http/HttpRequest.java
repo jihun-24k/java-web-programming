@@ -20,8 +20,6 @@ public class HttpRequest {
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> params = new HashMap<>();
 
-    private Map<String, String> cookies = new HashMap<>();
-
     public HttpRequest(InputStream in) {
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -34,7 +32,6 @@ public class HttpRequest {
             requestLine = new RequestLine(line);
 
             readHeader(bufferedReader);
-            readCookie(headers.get("Cookie"));
             if (getMethod().isPost()) {
                 int contentLength = Integer.parseInt(headers.get("Content-Length"));
                 String body = IOUtils.readData(bufferedReader, contentLength);
@@ -67,10 +64,6 @@ public class HttpRequest {
         headers.put(key, value);
     }
 
-    private void readCookie(String cookies) {
-        this.cookies = HttpRequestUtils.parseCookies(cookies);
-    }
-
     public HttpMethod getMethod() {
         return requestLine.getMethod();
     }
@@ -87,14 +80,7 @@ public class HttpRequest {
         return params.get(key);
     }
 
-    public String getCookie(String key) {
-        return cookies.get(key);
-    }
-
-    public boolean isLogin(String logined) {
-        if (getCookie(logined) == null) {
-            return false;
-        }
-        return Boolean.parseBoolean(getCookie(logined));
+    public HttpCookie getCookies() {
+        return new HttpCookie(getHeader("Cookie"));
     }
 }
