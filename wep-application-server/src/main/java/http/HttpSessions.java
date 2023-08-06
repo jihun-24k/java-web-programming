@@ -5,13 +5,20 @@ import java.util.Map;
 
 public class HttpSessions {
 
-    private Map<String, HttpSession> sessions = new HashMap<>();
+    private static Map<String, HttpSession> sessions = new HashMap<>();
 
-    public void addSession(String uuid, Object value) {
-        sessions.put(uuid, new HttpSession());
+    public static HttpSession getSession(String uuid) {
+
+        HttpSession session = sessions.get(uuid);
+
+        if (session == null) {
+            session = new HttpSession(uuid);
+            sessions.put(uuid, session);
+        }
+        return session;
     }
 
-    public HttpSession getSession(String uuid) {
-        return sessions.get(uuid);
+    public static void remove(String uuid) {
+        sessions.remove(uuid);
     }
 }
