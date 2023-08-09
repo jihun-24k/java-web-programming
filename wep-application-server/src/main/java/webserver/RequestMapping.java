@@ -2,10 +2,10 @@ package webserver;
 
 import java.util.HashMap;
 import java.util.Map;
-import webserver.controller.Controller;
-import webserver.controller.CreateUserController;
-import webserver.controller.ListUserController;
-import webserver.controller.LoginController;
+import controller.Controller;
+import controller.CreateUserController;
+import controller.ListUserController;
+import controller.LoginController;
 
 public class RequestMapping {
 
