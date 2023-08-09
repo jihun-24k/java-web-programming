@@ -3,32 +3,23 @@ package controller;
 import db.DataBase;
 import http.HttpRequest;
 import http.HttpResponse;
+import http.HttpSession;
 import model.User;
 
 public class LoginController extends AbstractController{
 
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
-        if (canLogin(request)) {
-            response.addHeader("Set-Cookie", "logined=true");
-            response.sendRedirect("/index.html");
+        User user = DataBase.findUserById(request.getParameter("userId"));
+        if (user != null) {
+            if (user.login(request.getParameter("password"))) {
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
+                response.sendRedirect("/index.html");
+            }
         }
         else {
             response.sendRedirect("/login_failed.html");
         }
-    }
-
-    private boolean canLogin(HttpRequest request) {
-        User findUser = DataBase.findUserById(request.getParameter("userId"));
-
-        if (findUser == null) {
-            return false;
-        }
-
-        if (!findUser.getPassword().equals(request.getParameter("password"))) {
-            return false;
-        }
-
-        return true;
     }
 }
